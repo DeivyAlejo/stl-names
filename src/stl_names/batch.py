@@ -29,6 +29,7 @@ def process_batch(
     base_height_mm: float = 2.0,
     rounded: bool = False,
     corner_radius_mm: float = 0.4,
+    bed_face: str = "bottom",
     out_dir: str = "output",
 ) -> dict[str, str]:
     """Process all names in *names_file* and return a result summary.
@@ -61,6 +62,7 @@ def process_batch(
                 base_height_mm=base_height_mm,
                 rounded=rounded,
                 corner_radius_mm=corner_radius_mm,
+                bed_face=bed_face,
                 out_dir=out_dir,
             )
             print(f"  [ok]   '{name}' -> {out_path}")

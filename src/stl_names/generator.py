@@ -4,7 +4,6 @@ Used by both the runner scripts and the CLI commands.
 """
 from __future__ import annotations
 
-import warnings
 from pathlib import Path
 
 from shapely.geometry import Polygon
@@ -17,8 +16,9 @@ from .exporter import (
     export_stl,
     get_output_path,
 )
-from .mesh_builder import build_mesh
+from .mesh_builder import build_mesh, orient_mesh_for_bed
 from .outline_builder import build_name_outlines
+from .rounding import round_tight_corners
 
 
 def generate_name(
@@ -30,6 +30,7 @@ def generate_name(
     base_height_mm: float = 2.0,
     rounded: bool = False,
     corner_radius_mm: float = 0.4,
+    bed_face: str = "bottom",
     out_dir: str = "output",
 ) -> Path:
     """Generate a 3D-printable STL file for *name*.
@@ -43,8 +44,9 @@ def generate_name(
     base            : If True, add a rectangular strip below the letters to
                       connect them (useful for non-cursive fonts).
     base_height_mm  : Y-height of the base strip in mm (only used when base=True).
-    rounded         : If True, apply corner rounding to the letters.
-    corner_radius_mm: Radius for rounded corners in mm (only used when rounded=True).
+    rounded         : If True, smooth narrow/tight corners at letter joints.
+    corner_radius_mm: Smoothing radius in mm (only used when rounded=True).
+    bed_face        : Which face should go against the print bed: "bottom" or "top".
     out_dir         : Directory for output files (created if it does not exist).
 
     Returns
@@ -56,7 +58,7 @@ def generate_name(
     PrinterLengthError    : Model exceeds 28 cm; STL not written.
     GlyphConnectionError  : Letters cannot be connected; base disabled.
     FileNotFoundError     : Font file or system font name not found.
-    ValueError            : Unsupported character, empty name, etc.
+    ValueError            : Unsupported character, empty name, invalid bed_face, etc.
     """
     if not name.strip():
         raise ValueError("Name must not be empty.")
@@ -70,9 +72,9 @@ def generate_name(
     # 3. Merge all placed glyphs into one 2D profile
     text_profile: Polygon = merge_placed_glyphs(placed)
 
-    # 3b. Apply corner rounding if requested
+    # 3b. Smooth tight/narrow corners if requested
     if rounded and corner_radius_mm > 0:
-        text_profile = text_profile.buffer(corner_radius_mm, resolution=16)
+        text_profile = round_tight_corners(text_profile, corner_radius_mm)
 
     # 4. Optionally build and union the base strip
     base_profile: Polygon | None = None
@@ -85,6 +87,9 @@ def generate_name(
 
     # 6. Extrude to 3D mesh
     mesh = build_mesh(text_profile, base_profile, thickness_mm)
+
+    # 6b. Orient selected face against bed
+    mesh = orient_mesh_for_bed(mesh, bed_face=bed_face)
 
     # 7. Write STL
     out_path = get_output_path(name, out_dir)
