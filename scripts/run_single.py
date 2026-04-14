@@ -13,10 +13,10 @@ No command-line arguments are needed.
 # CONFIG – edit these values
 # ============================================================
 
-NAME           = "Sana"                         # Name to generate (case-sensitive)
+NAME           = "Sofia"                         # Name to generate (case-sensitive)
 FONT           = "fonts/Cookie-Regular.ttf"  # .ttf/.otf path, or system font name
 HEIGHT_MM      = 20.0                            # Letter cap-height in mm
-THICKNESS_MM   = 4.0                             # Z-depth (print thickness) in mm
+THICKNESS_MM   = 5.0                             # Z-depth (print thickness) in mm
 BASE           = False                           # True = add a connecting base strip
 BASE_HEIGHT_MM = 2.0                             # Height of base strip in mm (BASE=True only)
 ROUNDED        = True                           # True = round the letter corners
