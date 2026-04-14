@@ -59,7 +59,7 @@ This project converts text into connected 3D solids for name tags, signs, and de
 1. Clone and enter project:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/DeivyAlejo/stl-names.git
 cd stl-names
 ```
 
@@ -80,7 +80,7 @@ uv run pytest tests/ -q
 1. Clone and enter project:
 
 ```powershell
-git clone <your-repo-url>
+git clone https://github.com/DeivyAlejo/stl-names.git
 cd stl-names
 ```
 
