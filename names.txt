@@ -1,9 +1,10 @@
-# Sample names for batch generation
-# One name per line; blank lines and # comments are ignored
-
-Sofia
-Maria
-Ana
-# ANA would be skipped below (same filename as Ana)
-Lucas
-Valentina
+Mahnoor
+Sana
+Shehnin
+Javairia
+Jessica
+Reem
+Zainab
+Zaheeba
+Areej
+Fatima

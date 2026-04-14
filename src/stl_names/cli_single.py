@@ -20,6 +20,7 @@ def main(
     base_height: float = typer.Option(2.0, "--base-height", help="Height of base strip in mm."),
     rounded: bool = typer.Option(False, "--rounded/--no-rounded", help="Round the letter corners."),
     corner_radius: float = typer.Option(0.4, "--corner-radius", help="Corner radius in mm."),
+    bed_face: str = typer.Option("bottom", "--bed-face", help="Face against bed: top or bottom."),
     out_dir: str = typer.Option("output", "--out-dir", "-o", help="Output directory."),
 ) -> None:
     """Generate a 3D-printable STL for NAME using the specified font and parameters."""
@@ -33,6 +34,7 @@ def main(
             base_height_mm=base_height,
             rounded=rounded,
             corner_radius_mm=corner_radius,
+            bed_face=bed_face,
             out_dir=out_dir,
         )
         typer.echo(f"Generated: {out_path}")

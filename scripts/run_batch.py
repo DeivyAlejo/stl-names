@@ -17,15 +17,16 @@ No command-line arguments are needed.
 # CONFIG – edit these values
 # ============================================================
 
-NAMES_FILE    = "names.txt"                     # TXT file with one name per line
-FONT          = "fonts/Parisienne-Regular.ttf"  # .ttf/.otf path, or system font name
-HEIGHT_MM     = 20.0                            # Letter cap-height in mm
-THICKNESS_MM  = 5.0                             # Z-depth (print thickness) in mm
-BASE          = False                           # True = add a connecting base strip
-BASE_HEIGHT_MM = 2.0                            # Height of base strip in mm (BASE=True only)
-ROUNDED       = False                           # True = round the letter corners
-CORNER_RADIUS_MM = 0.4                          # Corner radius in mm (ROUNDED=True only)
-OUT_DIR       = "output"                        # Output directory (created if missing)
+NAMES_FILE      = "names.txt"                    # TXT file with one name per line
+FONT            = "fonts/Cookie-Regular.ttf" # .ttf/.otf path, or system font name
+HEIGHT_MM       = 20.0                           # Letter cap-height in mm
+THICKNESS_MM    = 4.0                            # Z-depth (print thickness) in mm
+BASE            = False                          # True = add a connecting base strip
+BASE_HEIGHT_MM  = 2.0                            # Height of base strip in mm (BASE=True only)
+ROUNDED         = True                          # True = round tight letter corners
+CORNER_RADIUS_MM = 0.4                           # Corner radius in mm (ROUNDED=True only)
+BED_FACE        = "top"                      # Face on bed: "bottom" or "top"
+OUT_DIR         = "output"                       # Output directory (created if missing)
 
 # ============================================================
 # Execution – do not edit below this line
@@ -54,6 +55,7 @@ def run() -> None:
         print(f"  Rounded   : yes ({CORNER_RADIUS_MM} mm radius)")
     else:
         print("  Rounded   : no")
+    print(f"  Bed Face  : {BED_FACE}")
     print(f"  Output    : {OUT_DIR}/")
     print("=" * 50)
     print()
@@ -67,6 +69,7 @@ def run() -> None:
         base_height_mm=BASE_HEIGHT_MM,
         rounded=ROUNDED,
         corner_radius_mm=CORNER_RADIUS_MM,
+        bed_face=BED_FACE,
         out_dir=OUT_DIR,
     )
 

@@ -7,7 +7,7 @@ from shapely.ops import unary_union
 
 _CONNECT_STEP_MM = 0.05     # shift step size in mm
 _MAX_SHIFT_FRACTION = 0.85  # max fraction of advance width to attempt shifting
-_OVERLAP_MM = 0.2           # desired overlap between adjacent glyphs in mm
+_OVERLAP_MM = 0.2           # desired X-overlap between adjacent glyphs in mm
 
 
 class GlyphConnectionError(ValueError):
@@ -79,7 +79,7 @@ def _find_connection_x(
     char_prev: str,
     char_curr: str,
 ) -> float:
-    """Return the x position where curr_poly overlaps prev_poly.
+    """Return the x position where curr_poly overlaps prev_poly by overlap_mm.
 
     Starts at start_x and shifts left in steps until overlap is achieved, or raises
     GlyphConnectionError if max shift is reached without connection.
@@ -88,11 +88,11 @@ def _find_connection_x(
     shift = 0.0
     current = affinity.translate(curr_poly, xoff=start_x)
 
-    while not _has_overlap(prev_poly, current) and shift < max_shift:
+    while not _has_overlap(prev_poly, current, overlap_mm=overlap_mm) and shift < max_shift:
         shift += step
         current = affinity.translate(curr_poly, xoff=start_x - shift)
 
-    if not _has_overlap(prev_poly, current):
+    if not _has_overlap(prev_poly, current, overlap_mm=overlap_mm):
         raise GlyphConnectionError(
             f"Cannot connect '{char_curr}' to '{char_prev}' with the selected font.\n"
             "Options:\n"
@@ -103,7 +103,12 @@ def _find_connection_x(
     return start_x - shift
 
 
-def _has_overlap(a: Polygon, b: Polygon) -> bool:
-    """True if two polygons have actual intersection (overlap, not just touching)."""
+def _has_overlap(a: Polygon, b: Polygon, overlap_mm: float = _OVERLAP_MM) -> bool:
+    """True if polygons overlap with at least overlap_mm along X and non-zero area."""
     intersection = a.intersection(b)
-    return not intersection.is_empty
+    if intersection.is_empty or intersection.area <= 0:
+        return False
+
+    min_x, _min_y, max_x, _max_y = intersection.bounds
+    x_overlap = max_x - min_x
+    return x_overlap >= max(0.0, overlap_mm)
