@@ -8,6 +8,7 @@ from shapely.geometry import Polygon
 from .font_loader import get_char_cmap, get_font_metrics, get_glyph_set, load_font
 
 _CURVE_SAMPLES = 24  # line segments per Bezier curve
+_REFERENCE_SCALE_CHARS = ("a", "e", "o")
 
 
 def build_name_outlines(
@@ -24,7 +25,13 @@ def build_name_outlines(
     glyph_set = get_glyph_set(font)
     cmap = get_char_cmap(font)
     metrics = get_font_metrics(font)
-    scale = target_height_mm / metrics["cap_height"]
+    scale = _compute_scale_from_reference_letters(
+        name,
+        glyph_set,
+        cmap,
+        target_height_mm,
+        metrics,
+    )
 
     result: list[tuple[Polygon | None, float]] = []
     for char in name:
@@ -43,6 +50,72 @@ def build_name_outlines(
         result.append((poly, advance_width_mm))
 
     return result
+
+
+def _compute_scale_from_reference_letters(
+    name: str,
+    glyph_set,
+    cmap: dict[int, str],
+    target_height_mm: float,
+    metrics: dict,
+) -> float:
+    """Compute a uniform scale anchored to reference lowercase glyphs.
+
+    Tries lowercase `a`, `e`, and `o` (or uppercase variants when lowercase is
+    missing) to make size consistent across names regardless of first letter
+    shape (for example names starting with descenders like J/j).
+
+    Fallback order if references are unavailable:
+    1) first drawable glyph from *name*
+    2) cap-height font metric
+    """
+    reference_heights: list[float] = []
+
+    for char in _REFERENCE_SCALE_CHARS:
+        glyph = _get_glyph_for_char(char, glyph_set, cmap)
+        if glyph is None:
+            glyph = _get_glyph_for_char(char.upper(), glyph_set, cmap)
+        if glyph is None:
+            continue
+
+        glyph_height = _get_glyph_height_units(glyph)
+        if glyph_height > 0:
+            reference_heights.append(glyph_height)
+
+    if reference_heights:
+        reference_height = sum(reference_heights) / len(reference_heights)
+        return target_height_mm / reference_height
+
+    for char in name:
+        glyph = _get_glyph_for_char(char, glyph_set, cmap)
+        if glyph is None:
+            continue
+
+        glyph_height_units = _get_glyph_height_units(glyph)
+        if glyph_height_units > 0:
+            return target_height_mm / glyph_height_units
+
+    cap_height = metrics.get("cap_height", 0)
+    if cap_height <= 0:
+        raise ValueError("Font cap-height metric is invalid; cannot determine size scale.")
+    return target_height_mm / cap_height
+
+
+def _get_glyph_for_char(char: str, glyph_set, cmap: dict[int, str]):
+    """Return glyph for *char* when available in cmap and glyph set."""
+    glyph_name = cmap.get(ord(char))
+    if glyph_name is None:
+        return None
+    return glyph_set.get(glyph_name)
+
+
+def _get_glyph_height_units(glyph) -> float:
+    """Return unscaled glyph bbox height in font units."""
+    poly = _glyph_to_polygon(glyph, scale=1.0)
+    if poly is None or poly.is_empty:
+        return 0.0
+    _min_x, min_y, _max_x, max_y = poly.bounds
+    return max(0.0, max_y - min_y)
 
 
 def _glyph_to_polygon(glyph, scale: float) -> Polygon | None:

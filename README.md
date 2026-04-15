@@ -23,9 +23,12 @@ This project converts text into connected 3D solids for name tags, signs, and de
 
 - Auto-connect letters by shifting glyphs until overlap is reached.
 - Configurable dimensions:
-  - letter height (mm),
+  - letter height (mm, anchored to reference letters a/e/o for consistent scaling),
   - thickness/depth (mm),
   - base height (mm).
+- Lowercase i/j dot behavior:
+  - keep and auto-attach dots to stems before rounding (default), or
+  - remove dots completely.
 - Rounded/tight-corner smoothing:
   - enable/disable,
   - configurable radius (default `0.4` mm).
@@ -137,6 +140,7 @@ In both runner files you can set:
 - `THICKNESS_MM`
 - `BASE` and `BASE_HEIGHT_MM`
 - `ROUNDED` and `CORNER_RADIUS_MM`
+- `KEEP_IJ_DOTS` (attach lowercase i/j dots when `True`, remove when `False`)
 - `BED_FACE` (`"bottom"` or `"top"`)
 - `OUT_DIR`
 

@@ -29,6 +29,7 @@ def process_batch(
     base_height_mm: float = 2.0,
     rounded: bool = False,
     corner_radius_mm: float = 0.4,
+    keep_ij_dots: bool = True,
     bed_face: str = "bottom",
     out_dir: str = "output",
 ) -> dict[str, str]:
@@ -62,6 +63,7 @@ def process_batch(
                 base_height_mm=base_height_mm,
                 rounded=rounded,
                 corner_radius_mm=corner_radius_mm,
+                keep_ij_dots=keep_ij_dots,
                 bed_face=bed_face,
                 out_dir=out_dir,
             )
