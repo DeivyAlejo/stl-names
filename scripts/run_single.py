@@ -13,8 +13,8 @@ No command-line arguments are needed.
 # CONFIG – edit these values
 # ============================================================
 
-NAME             = "Ammi"                       # Name to generate (case-sensitive)
-FONT             = "fonts/Cookie-Regular.ttf"   # .ttf/.otf path, or system font name
+NAME             = "Deivy"                       # Name to generate (case-sensitive)
+FONT             = "fonts/Lobster-Regular.ttf"   # .ttf/.otf path, or system font name
 HEIGHT_MM        = 16.0                          # Letter height anchor in mm (uses reference a/e/o)
 THICKNESS_MM     = 3.0                           # Z-depth (print thickness) in mm
 BASE             = False                         # True = add a connecting base strip

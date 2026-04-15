@@ -40,6 +40,23 @@ This project converts text into connected 3D solids for name tags, signs, and de
   - sanitized characters,
   - duplicate filename detection in batch mode.
 
+### Height Normalization Notes
+
+- `--height` / `HEIGHT_MM` is normalized against reference glyphs `a`, `e`, and `o` (average of available glyph heights).
+- This avoids size jumps when a name starts with descenders like `J`/`j`.
+- Fallback order when those references are unavailable:
+  - first drawable glyph in the name,
+  - then font cap-height metrics.
+
+### i/j Dot Mode
+
+- CLI flags:
+  - `--keep-ij-dots` (default): move lowercase `i`/`j` dots down until they attach before rounding.
+  - `--remove-ij-dots`: remove lowercase `i`/`j` dots and skip attachment.
+- Runner scripts:
+  - set `KEEP_IJ_DOTS = True` to attach dots,
+  - set `KEEP_IJ_DOTS = False` to remove dots.
+
 ## Project Structure
 
 - `scripts/run_single.py`: non-CLI single-name runner (edit config in file).
@@ -166,6 +183,7 @@ uv run stl-single "Sofia" \
   --font "fonts/Parisienne-Regular.ttf" \
   --height 20 \
   --thickness 4 \
+  --keep-ij-dots \
   --rounded --corner-radius 0.4 \
   --bed-face bottom \
   --out-dir output
@@ -190,6 +208,7 @@ uv run stl-batch names.txt \
   --font "fonts/Parisienne-Regular.ttf" \
   --height 20 \
   --thickness 4 \
+  --remove-ij-dots \
   --rounded --corner-radius 0.4 \
   --bed-face bottom \
   --out-dir output
@@ -200,13 +219,13 @@ uv run stl-batch names.txt \
 Single name:
 
 ```powershell
-uv run stl-single "Sofia" --font "fonts/Parisienne-Regular.ttf" --height 20 --thickness 4 --rounded --corner-radius 0.4 --bed-face bottom --out-dir output
+uv run stl-single "Sofia" --font "fonts/Parisienne-Regular.ttf" --height 20 --thickness 4 --keep-ij-dots --rounded --corner-radius 0.4 --bed-face bottom --out-dir output
 ```
 
 Batch:
 
 ```powershell
-uv run stl-batch names.txt --font "fonts/Parisienne-Regular.ttf" --height 20 --thickness 4 --rounded --corner-radius 0.4 --bed-face bottom --out-dir output
+uv run stl-batch names.txt --font "fonts/Parisienne-Regular.ttf" --height 20 --thickness 4 --remove-ij-dots --rounded --corner-radius 0.4 --bed-face bottom --out-dir output
 ```
 
 ## Batch Input Format
